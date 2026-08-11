@@ -47,7 +47,7 @@ ROUTINE = [
             "• 불필요한 반복문이 있었는가?\n"
             "• 더 적절한 자료구조가 있는가?\n"
             "• 같은 계산을 반복하고 있지 않은가?\n"
-            "• O(N²)을 더 줄일 수 있는가?"
+            "• O(N²)을 O(N) 또는 O(N log N)으로 줄일 수 있는가?"
         ),
     },
     {
@@ -59,7 +59,7 @@ ROUTINE = [
             "• 코드를 외우지 말 것\n"
             "• 풀이 아이디어를 먼저 말로 설명할 것\n"
             "• 자료구조를 선택한 이유를 생각할 것\n"
-            "• 막히면 필요한 부분만 다시 확인"
+            "• 막히면 정답 전체가 아니라 필요한 부분만 확인"
         ),
     },
     {
@@ -97,9 +97,6 @@ ACCENT_HOVER = "#6D5EE7"
 
 BORDER = "#2D323C"
 
-SUCCESS = "#58C78A"
-DANGER = "#E66B6B"
-
 
 # =========================================================
 # Application
@@ -122,27 +119,21 @@ class AlgorithmTimer:
         self.root.configure(bg=BG)
         self.root.resizable(False, False)
 
-        # 처음에는 항상 위
+        # 기본값: 항상 위
         self.root.attributes("-topmost", True)
 
         self.current_step = 0
-
-        self.remaining_seconds = (
-            self.get_current_duration()
-        )
+        self.remaining_seconds = self.get_current_duration()
 
         self.running = False
         self.after_id = None
-
         self.mini_mode = False
 
-        self.topmost_var = tk.BooleanVar(
-            value=True
-        )
+        self.topmost_var = tk.BooleanVar(value=True)
 
         self.setup_style()
 
-        # 일반/미니 화면을 아예 분리
+        # 일반 화면 / 미니 화면 분리
         self.normal_frame = tk.Frame(
             self.root,
             bg=BG,
@@ -157,7 +148,6 @@ class AlgorithmTimer:
         self.create_mini_view()
 
         self.show_normal_view()
-
         self.update_screen()
 
     # =====================================================
@@ -172,7 +162,6 @@ class AlgorithmTimer:
         except tk.TclError:
             pass
 
-        # Progressbar
         self.style.configure(
             "Study.Horizontal.TProgressbar",
             troughcolor=CARD_ALT,
@@ -188,10 +177,7 @@ class AlgorithmTimer:
     # =====================================================
 
     def get_current_duration(self):
-        return (
-            ROUTINE[self.current_step]["minutes"]
-            * 60
-        )
+        return ROUTINE[self.current_step]["minutes"] * 60
 
     def create_button(
         self,
@@ -199,18 +185,10 @@ class AlgorithmTimer:
         text,
         command,
         primary=False,
-        width=110,
-        height=40,
+        width=12,
     ):
-        background = (
-            ACCENT if primary
-            else CARD_ALT
-        )
-
-        hover = (
-            ACCENT_HOVER if primary
-            else "#292E38"
-        )
+        background = ACCENT if primary else CARD_ALT
+        hover = ACCENT_HOVER if primary else "#292E38"
 
         button = tk.Button(
             parent,
@@ -228,23 +206,18 @@ class AlgorithmTimer:
                 10,
                 "bold" if primary else "normal",
             ),
+            width=width,
+            height=2,
+            anchor="center",
+            justify="center",
             cursor="hand2",
         )
 
-        button.configure(
-            width=max(1, width // 10),
-            height=max(1, height // 20),
-        )
-
         def on_enter(_):
-            button.configure(
-                bg=hover
-            )
+            button.configure(bg=hover)
 
         def on_leave(_):
-            button.configure(
-                bg=background
-            )
+            button.configure(bg=background)
 
         button.bind("<Enter>", on_enter)
         button.bind("<Leave>", on_leave)
@@ -274,44 +247,32 @@ class AlgorithmTimer:
             header,
             bg=BG,
         )
-        title_area.pack(
-            side="left"
-        )
+        title_area.pack(side="left")
 
         tk.Label(
             title_area,
             text="Algorithm Study",
             bg=BG,
             fg=TEXT,
-            font=(
-                "Segoe UI",
-                24,
-                "bold",
-            ),
-        ).pack(
-            anchor="w"
-        )
+            font=("Segoe UI", 24, "bold"),
+        ).pack(anchor="w")
 
         tk.Label(
             title_area,
             text="Daily 60-minute routine",
             bg=BG,
             fg=SUB_TEXT,
-            font=(
-                "Segoe UI",
-                10,
-            ),
+            font=("Segoe UI", 10),
         ).pack(
             anchor="w",
             pady=(3, 0),
         )
 
-        # 미니모드 버튼
         self.mini_button = self.create_button(
             header,
             "미니 모드",
             self.show_mini_view,
-            width=100,
+            width=10,
         )
         self.mini_button.pack(
             side="right",
@@ -354,30 +315,20 @@ class AlgorithmTimer:
             activebackground=CARD,
             activeforeground=TEXT,
             selectcolor=ACCENT,
-            font=(
-                "맑은 고딕",
-                10,
-            ),
+            font=("맑은 고딕", 10),
             cursor="hand2",
             bd=0,
             highlightthickness=0,
         )
-        self.topmost_switch.pack(
-            side="left"
-        )
+        self.topmost_switch.pack(side="left")
 
         tk.Label(
             option_inner,
             text="다른 창을 선택해도 타이머를 앞에 유지합니다.",
             bg=CARD,
             fg=SUB_TEXT,
-            font=(
-                "맑은 고딕",
-                9,
-            ),
-        ).pack(
-            side="right"
-        )
+            font=("맑은 고딕", 9),
+        ).pack(side="right")
 
         # ---------------------------------------------
         # Timer Card
@@ -408,46 +359,29 @@ class AlgorithmTimer:
             timer_inner,
             bg=CARD,
         )
-        top_line.pack(
-            fill="x",
-        )
+        top_line.pack(fill="x")
 
         self.step_label = tk.Label(
             top_line,
             bg=CARD,
             fg=TEXT,
-            font=(
-                "맑은 고딕",
-                17,
-                "bold",
-            ),
+            font=("맑은 고딕", 17, "bold"),
         )
-        self.step_label.pack(
-            side="left"
-        )
+        self.step_label.pack(side="left")
 
         self.progress_label = tk.Label(
             top_line,
             bg=CARD,
             fg=SUB_TEXT,
-            font=(
-                "Segoe UI",
-                10,
-            ),
+            font=("Segoe UI", 10),
         )
-        self.progress_label.pack(
-            side="right"
-        )
+        self.progress_label.pack(side="right")
 
         self.timer_label = tk.Label(
             timer_inner,
             bg=CARD,
             fg=TEXT,
-            font=(
-                "Consolas",
-                58,
-                "bold",
-            ),
+            font=("Consolas", 58, "bold"),
         )
         self.timer_label.pack(
             pady=(18, 12)
@@ -455,14 +389,10 @@ class AlgorithmTimer:
 
         self.progress_bar = ttk.Progressbar(
             timer_inner,
-            style=(
-                "Study.Horizontal.TProgressbar"
-            ),
+            style="Study.Horizontal.TProgressbar",
             maximum=100,
         )
-        self.progress_bar.pack(
-            fill="x",
-        )
+        self.progress_bar.pack(fill="x")
 
         # ---------------------------------------------
         # Description
@@ -473,46 +403,83 @@ class AlgorithmTimer:
             bg=CARD,
             highlightbackground=BORDER,
             highlightthickness=1,
+            height=220,
         )
+
         description_card.pack(
-            fill="both",
+            fill="x",
             padx=32,
             pady=16,
         )
+
+        # 내용 길이에 따라 카드 크기가 변하지 않음
+        description_card.pack_propagate(False)
 
         description_header = tk.Label(
             description_card,
             text="지금 할 일",
             bg=CARD,
             fg=SUB_TEXT,
-            font=(
-                "맑은 고딕",
-                9,
-                "bold",
-            ),
+            font=("맑은 고딕", 9, "bold"),
         )
         description_header.pack(
             anchor="w",
             padx=20,
-            pady=(16, 5),
+            pady=(15, 5),
         )
 
-        self.description_label = tk.Label(
+        description_content = tk.Frame(
             description_card,
             bg=CARD,
-            fg=TEXT,
-            justify="left",
-            anchor="nw",
-            wraplength=580,
-            font=(
-                "맑은 고딕",
-                10,
-            ),
         )
-        self.description_label.pack(
+        description_content.pack(
             fill="both",
-            padx=20,
-            pady=(5, 18),
+            expand=True,
+            padx=(20, 12),
+            pady=(0, 15),
+        )
+
+        description_scrollbar = tk.Scrollbar(
+            description_content,
+            orient="vertical",
+            bg=CARD_ALT,
+            troughcolor=CARD,
+            activebackground=ACCENT,
+            bd=0,
+            highlightthickness=0,
+        )
+        description_scrollbar.pack(
+            side="right",
+            fill="y",
+        )
+
+        self.description_text = tk.Text(
+            description_content,
+            bg=CARD,
+            fg=TEXT,
+            insertbackground=TEXT,
+            selectbackground=ACCENT,
+            relief="flat",
+            bd=0,
+            highlightthickness=0,
+            wrap="word",
+            font=("맑은 고딕", 10),
+            yscrollcommand=description_scrollbar.set,
+            padx=0,
+            pady=0,
+        )
+        self.description_text.pack(
+            side="left",
+            fill="both",
+            expand=True,
+        )
+
+        description_scrollbar.config(
+            command=self.description_text.yview
+        )
+
+        self.description_text.config(
+            state="disabled"
         )
 
         # ---------------------------------------------
@@ -524,60 +491,66 @@ class AlgorithmTimer:
             bg=BG,
         )
         controls.pack(
+            fill="x",
+            padx=32,
             pady=(2, 16),
         )
 
-        self.start_button = (
-            self.create_button(
-                controls,
-                "시작",
-                self.start,
-                primary=True,
+        # 4개의 버튼 영역을 동일한 크기로
+        for i in range(4):
+            controls.grid_columnconfigure(
+                i,
+                weight=1,
+                uniform="control",
             )
+
+        self.start_button = self.create_button(
+            controls,
+            "시작",
+            self.start,
+            primary=True,
         )
         self.start_button.grid(
             row=0,
             column=0,
-            padx=5,
+            padx=(0, 4),
+            sticky="ew",
         )
 
-        self.pause_button = (
-            self.create_button(
-                controls,
-                "일시정지",
-                self.pause,
-            )
+        self.pause_button = self.create_button(
+            controls,
+            "일시정지",
+            self.pause,
         )
         self.pause_button.grid(
             row=0,
             column=1,
-            padx=5,
+            padx=4,
+            sticky="ew",
         )
 
-        self.next_button = (
-            self.create_button(
-                controls,
-                "다음 단계",
-                self.next_step,
-            )
+        self.next_button = self.create_button(
+            controls,
+            "다음 단계",
+            self.next_step,
         )
         self.next_button.grid(
             row=0,
             column=2,
-            padx=5,
+            padx=4,
+            sticky="ew",
         )
 
-        self.reset_button = (
-            self.create_button(
-                controls,
-                "처음부터",
-                self.reset,
-            )
+        self.reset_button = self.create_button(
+            controls,
+            "처음부터",
+            self.reset,
         )
         self.reset_button.grid(
             row=0,
             column=3,
-            padx=5,
+            padx=(4, 0),
+            sticky="ew",
         )
 
         # ---------------------------------------------
@@ -592,10 +565,7 @@ class AlgorithmTimer:
             ),
             bg=BG,
             fg=SUB_TEXT,
-            font=(
-                "Segoe UI",
-                9,
-            ),
+            font=("Segoe UI", 9),
         )
         self.routine_label.pack(
             pady=(0, 15)
@@ -619,7 +589,6 @@ class AlgorithmTimer:
             pady=8,
         )
 
-        # 최상단
         top = tk.Frame(
             container,
             bg=CARD,
@@ -634,17 +603,10 @@ class AlgorithmTimer:
             top,
             bg=CARD,
             fg=SUB_TEXT,
-            font=(
-                "맑은 고딕",
-                9,
-                "bold",
-            ),
+            font=("맑은 고딕", 9, "bold"),
         )
-        self.mini_step_label.pack(
-            side="left"
-        )
+        self.mini_step_label.pack(side="left")
 
-        # 이 버튼은 항상 보이도록 최상단 우측에 배치
         self.restore_button = tk.Button(
             top,
             text="전체 보기",
@@ -656,86 +618,78 @@ class AlgorithmTimer:
             relief="flat",
             bd=0,
             highlightthickness=0,
-            font=(
-                "맑은 고딕",
-                8,
-            ),
+            font=("맑은 고딕", 8),
             cursor="hand2",
             padx=8,
             pady=4,
         )
-        self.restore_button.pack(
-            side="right"
-        )
+        self.restore_button.pack(side="right")
 
-        # 시간
         self.mini_timer_label = tk.Label(
             container,
             bg=CARD,
             fg=TEXT,
-            font=(
-                "Consolas",
-                36,
-                "bold",
-            ),
+            font=("Consolas", 36, "bold"),
         )
         self.mini_timer_label.pack(
             pady=(8, 5)
         )
 
-        # 버튼
         mini_controls = tk.Frame(
             container,
             bg=CARD,
         )
         mini_controls.pack(
-            pady=(2, 10)
+            fill="x",
+            padx=14,
+            pady=(2, 10),
         )
 
-        self.mini_start_button = (
-            self.create_button(
-                mini_controls,
-                "시작",
-                self.start,
-                primary=True,
-                width=70,
-                height=32,
+        for i in range(3):
+            mini_controls.grid_columnconfigure(
+                i,
+                weight=1,
+                uniform="mini_control",
             )
+
+        self.mini_start_button = self.create_button(
+            mini_controls,
+            "시작",
+            self.start,
+            primary=True,
+            width=8,
         )
         self.mini_start_button.grid(
             row=0,
             column=0,
-            padx=3,
+            padx=(0, 3),
+            sticky="ew",
         )
 
-        self.mini_pause_button = (
-            self.create_button(
-                mini_controls,
-                "정지",
-                self.pause,
-                width=70,
-                height=32,
-            )
+        self.mini_pause_button = self.create_button(
+            mini_controls,
+            "정지",
+            self.pause,
+            width=8,
         )
         self.mini_pause_button.grid(
             row=0,
             column=1,
             padx=3,
+            sticky="ew",
         )
 
-        self.mini_next_button = (
-            self.create_button(
-                mini_controls,
-                "다음",
-                self.next_step,
-                width=70,
-                height=32,
-            )
+        self.mini_next_button = self.create_button(
+            mini_controls,
+            "다음",
+            self.next_step,
+            width=8,
         )
         self.mini_next_button.grid(
             row=0,
             column=2,
-            padx=3,
+            padx=(3, 0),
+            sticky="ew",
         )
 
     # =====================================================
@@ -748,8 +702,7 @@ class AlgorithmTimer:
         self.mini_frame.pack_forget()
 
         self.root.geometry(
-            f"{self.NORMAL_WIDTH}x"
-            f"{self.NORMAL_HEIGHT}"
+            f"{self.NORMAL_WIDTH}x{self.NORMAL_HEIGHT}"
         )
 
         self.normal_frame.pack(
@@ -765,8 +718,7 @@ class AlgorithmTimer:
         self.normal_frame.pack_forget()
 
         self.root.geometry(
-            f"{self.MINI_WIDTH}x"
-            f"{self.MINI_HEIGHT}"
+            f"{self.MINI_WIDTH}x{self.MINI_HEIGHT}"
         )
 
         self.mini_frame.pack(
@@ -844,21 +796,14 @@ class AlgorithmTimer:
     # =====================================================
 
     def complete_step(self):
-        current_name = (
-            ROUTINE[self.current_step]["name"]
-        )
+        current_name = ROUTINE[self.current_step]["name"]
 
-        if (
-            self.current_step
-            == len(ROUTINE) - 1
-        ):
+        if self.current_step == len(ROUTINE) - 1:
             messagebox.showinfo(
                 "오늘 공부 완료",
                 (
-                    "오늘의 알고리즘 1시간 루틴을 "
-                    "완료했습니다.\n\n"
-                    "복습이 필요한 문제는 "
-                    "따로 표시해두세요."
+                    "오늘의 알고리즘 1시간 루틴을 완료했습니다.\n\n"
+                    "복습이 필요한 문제는 따로 표시해두세요."
                 ),
             )
 
@@ -867,11 +812,9 @@ class AlgorithmTimer:
             )
             return
 
-        next_name = (
-            ROUTINE[
-                self.current_step + 1
-            ]["name"]
-        )
+        next_name = ROUTINE[
+            self.current_step + 1
+        ]["name"]
 
         messagebox.showinfo(
             "단계 완료",
@@ -889,14 +832,11 @@ class AlgorithmTimer:
 
         self.update_screen()
 
-        # 자동으로 다음 단계 시작
+        # 다음 단계 자동 시작
         self.start()
 
     def next_step(self):
-        if (
-            self.current_step
-            >= len(ROUTINE) - 1
-        ):
+        if self.current_step >= len(ROUTINE) - 1:
             messagebox.showinfo(
                 "마지막 단계",
                 "현재가 마지막 단계입니다.",
@@ -906,7 +846,6 @@ class AlgorithmTimer:
         self.stop_current_timer()
 
         self.current_step += 1
-
         self.remaining_seconds = (
             self.get_current_duration()
         )
@@ -918,7 +857,6 @@ class AlgorithmTimer:
         self.stop_current_timer()
 
         self.current_step = 0
-
         self.remaining_seconds = (
             self.get_current_duration()
         )
@@ -953,9 +891,9 @@ class AlgorithmTimer:
             f"{minutes:02d}:{seconds:02d}"
         )
 
-        # -----------------------------
+        # ---------------------------------------------
         # Normal View
-        # -----------------------------
+        # ---------------------------------------------
 
         self.step_label.config(
             text=routine["name"]
@@ -972,11 +910,29 @@ class AlgorithmTimer:
             text=time_text
         )
 
-        self.description_label.config(
-            text=routine["description"]
+        # 설명 업데이트
+        self.description_text.config(
+            state="normal"
         )
 
-        # 현재 단계 내부 진행률
+        self.description_text.delete(
+            "1.0",
+            tk.END
+        )
+
+        self.description_text.insert(
+            tk.END,
+            routine["description"]
+        )
+
+        # 단계 변경 시 항상 최상단
+        self.description_text.yview_moveto(0)
+
+        self.description_text.config(
+            state="disabled"
+        )
+
+        # 현재 단계 진행률
         duration = (
             routine["minutes"] * 60
         )
@@ -997,9 +953,9 @@ class AlgorithmTimer:
             percentage
         )
 
-        # -----------------------------
+        # ---------------------------------------------
         # Mini View
-        # -----------------------------
+        # ---------------------------------------------
 
         self.mini_step_label.config(
             text=(
