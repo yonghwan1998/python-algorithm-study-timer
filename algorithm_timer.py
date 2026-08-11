@@ -76,8 +76,11 @@ class AlgorithmTimer:
         self.root = root
 
         self.root.title("Algorithm Study Timer")
-        self.root.geometry("650x680")
+        self.root.geometry("650x720")
         self.root.resizable(False, False)
+
+        # 기본값: 항상 위에 표시
+        self.root.attributes("-topmost", True)
 
         self.current_step = 0
         self.remaining_seconds = self.get_current_duration()
@@ -107,6 +110,18 @@ class AlgorithmTimer:
         )
         self.total_label.pack()
 
+        # 항상 위 옵션
+        self.topmost_var = tk.BooleanVar(value=True)
+
+        self.topmost_checkbox = tk.Checkbutton(
+            self.root,
+            text="항상 위에 표시",
+            variable=self.topmost_var,
+            command=self.toggle_topmost,
+            font=("맑은 고딕", 10),
+        )
+        self.topmost_checkbox.pack(pady=(10, 0))
+
         # 현재 단계
         self.step_label = tk.Label(
             self.root,
@@ -128,21 +143,21 @@ class AlgorithmTimer:
         self.timer_label.pack(pady=15)
 
         # 현재 단계 설명 영역
-        description_frame = tk.LabelFrame(
+        self.description_frame = tk.LabelFrame(
             self.root,
             text=" 지금 할 일 ",
             font=("맑은 고딕", 11, "bold"),
             padx=15,
             pady=12,
         )
-        description_frame.pack(
+        self.description_frame.pack(
             padx=30,
             pady=5,
             fill="both",
         )
 
         self.description_label = tk.Label(
-            description_frame,
+            self.description_frame,
             justify="left",
             anchor="w",
             font=("맑은 고딕", 10),
@@ -220,11 +235,19 @@ class AlgorithmTimer:
         )
         self.routine_label.pack(pady=5)
 
+    def toggle_topmost(self):
+        """
+        항상 위에 표시 옵션 ON/OFF
+        """
+        self.root.attributes(
+            "-topmost",
+            self.topmost_var.get()
+        )
+
     def start(self):
         if self.running:
             return
 
-        # 이미 시간이 끝난 상태에서 시작하는 것 방지
         if self.remaining_seconds <= 0:
             return
 
@@ -297,7 +320,7 @@ class AlgorithmTimer:
 
         self.update_screen()
 
-        # 자동으로 다음 단계 시작
+        # 다음 단계 자동 시작
         self.start()
 
     def next_step(self):
