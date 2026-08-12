@@ -125,6 +125,11 @@ class AlgorithmTimer:
         self.current_step = 0
         self.remaining_seconds = self.get_current_duration()
 
+        # 설명 영역은 단계가 변경될 때만 갱신한다.
+        # 타이머가 1초마다 갱신될 때 설명 Text 위젯을 다시 작성하면
+        # 사용자가 보고 있던 스크롤 위치가 초기화될 수 있다.
+        self.displayed_description_step = None
+
         self.running = False
         self.after_id = None
         self.mini_mode = False
@@ -910,27 +915,31 @@ class AlgorithmTimer:
             text=time_text
         )
 
-        # 설명 업데이트
-        self.description_text.config(
-            state="normal"
-        )
+        # 설명은 단계가 변경된 경우에만 업데이트한다.
+        # 매초 Text 위젯을 delete/insert 하지 않으므로 현재 스크롤 위치가 유지된다.
+        if self.displayed_description_step != self.current_step:
+            self.description_text.config(
+                state="normal"
+            )
 
-        self.description_text.delete(
-            "1.0",
-            tk.END
-        )
+            self.description_text.delete(
+                "1.0",
+                tk.END
+            )
 
-        self.description_text.insert(
-            tk.END,
-            routine["description"]
-        )
+            self.description_text.insert(
+                tk.END,
+                routine["description"]
+            )
 
-        # 단계 변경 시 항상 최상단
-        self.description_text.yview_moveto(0)
+            # 새 단계로 넘어갔을 때만 설명의 시작 위치를 보여준다.
+            self.description_text.yview_moveto(0)
 
-        self.description_text.config(
-            state="disabled"
-        )
+            self.description_text.config(
+                state="disabled"
+            )
+
+            self.displayed_description_step = self.current_step
 
         # 현재 단계 진행률
         duration = (
