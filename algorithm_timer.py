@@ -11,7 +11,7 @@ ROUTINE = [
     {
         "name": "14일 전 문제 복습",
         "short_name": "14일 복습",
-        "minutes": 5,
+        "minutes": 10,
         "description": (
             "14일 전에 풀었던 문제를 다시 풀어보세요.\n\n"
             "• 이전 풀이와 정답 코드를 보지 않고 시작하기\n"
@@ -54,7 +54,7 @@ ROUTINE = [
     {
         "name": "다시 구현",
         "short_name": "재구현",
-        "minutes": 10,
+        "minutes": 15,
         "description": (
             "정답 코드를 닫고 처음부터 다시 작성하세요.\n\n"
             "• 코드를 외우지 말 것\n"
@@ -66,7 +66,7 @@ ROUTINE = [
     {
         "name": "문제 기록",
         "short_name": "기록",
-        "minutes": 10,
+        "minutes": 0,
         "description": (
             "오늘 푼 문제를 기록하세요.\n\n"
             "• 문제 이름 / 난이도\n"
@@ -566,8 +566,8 @@ class AlgorithmTimer:
         self.routine_label = tk.Label(
             self.normal_frame,
             text=(
-                "14일 복습 5m   ·   문제 풀이 25m   ·   "
-                "분석 10m   ·   재구현 10m   ·   기록 10m"
+                "14일 복습 10m   ·   문제 풀이 25m   ·   "
+                "분석 10m   ·   재구현 15m   ·   기록 제한 없음"
             ),
             bg=BG,
             fg=SUB_TEXT,
